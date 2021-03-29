@@ -128,7 +128,7 @@ def _run():
             except UnicodeEncodeError:
                 print('Done!')
 
-            if (pomodoro_count%4) == 0:
+            if ((pomodoro_count+1)%4) == 0:
                 try:
                     print('⏲️ Take a long break!')
                 except UnicodeEncodeError:
@@ -140,6 +140,7 @@ def _run():
                 except UnicodeEncodeError:
                     print('Take a short break!')
                 countdown_seconds(short)
+            pomodoro_count += 1
     except KeyboardInterrupt:
         pass
 
