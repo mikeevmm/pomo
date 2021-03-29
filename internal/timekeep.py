@@ -26,7 +26,9 @@ def _build_bar(fill, width, start_char, full_char, three_char, two_char,
 
     remainder_char = ''
     if remainder > 0.:
-        if remainder < .5:
+        if remainder < .25:
+            remainder_char = empty_char
+        elif remainder < .5:
             remainder_char = one_char
         elif remainder < .75:
             remainder_char = two_char
