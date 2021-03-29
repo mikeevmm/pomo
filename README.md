@@ -31,7 +31,7 @@ pomo set editor /bin/nano
 You can see all of `pomo`'s variables by calling
 
 ```bash
-pomo --list
+pomo list
 ```
 
 In particular, you can change the times of the pomodoros and breaks by calling
