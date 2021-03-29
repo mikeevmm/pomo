@@ -110,9 +110,9 @@ def _run():
         exit(0)
 
     # User feedback
-    print('\n')
     print('Ok, your tasks are:')
     print('\n'.join(f'  [{i}]: {task}' for i, task in enumerate(tasks)))
+    print('')
 
     # Start pomodoro routine
     start_time = time.time()
