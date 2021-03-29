@@ -110,6 +110,7 @@ def _run():
         exit(0)
 
     # User feedback
+    print('\n')
     print('Ok, your tasks are:')
     print('\n'.join(f'  [{i}]: {task}' for i, task in enumerate(tasks)))
 
@@ -140,14 +141,17 @@ def _run():
                     print('Take a short break!')
                 count_seconds(short)
     except KeyboardInterrupt:
-        # Give statistics
-        work_time = time.time() - start_time
-        print('Good work!')
-        print('Your tasks were:')
-        print('\n'.join(f'  - {task}' for i, task in enumerate(tasks)))
-        print(f'You worked for {human_time_interval(work_time)}.')
-        print(f'You worked through {pomodoro_count} pomodoros.')
-        print('See you next time!')
+        pass
+
+    # Give statistics
+    work_time = time.time() - start_time
+    print('\n')
+    print('Good work!')
+    print('Your tasks were:')
+    print('\n'.join(f'  - {task}' for i, task in enumerate(tasks)))
+    print(f'You worked for {human_time_interval(work_time)}.')
+    print(f'You worked through {pomodoro_count} pomodoros.')
+    print('See you next time!')
     exit(0)
 
 
