@@ -40,23 +40,28 @@ def _build_bar(fill, width, start_char, full_char, three_char, two_char,
             (width-2-total_count)*empty_char + end_char
 
 
-def count_seconds(time, width=50, update_freq=8):
+def countdown_seconds(time, width=50, update_freq=8):
+    last_width = 0
     for moment in range((time*update_freq)+1):
         second = moment/update_freq
-        fill = second/time
+        fill = 1. - second/time
         unicode_str = _build_bar(fill, width, _START_CHAR, _FULL_CHAR,
                         _THREE_CHAR, _TWO_CHAR, _ONE_CHAR, _EMPTY_CHAR,
                         _END_CHAR)
-        explicit_time = f' [{int(second)}/{time}]'
+        unit_str = 'seconds' if int(second) > 1 else 'second'
+        explicit_time = f' [{time - int(second)} {unit_str} left]'
         end = '\n' if int(second) == time else '\r'
 
         try:
-            print(unicode_str + explicit_time, end=end)
+            final_str = unicode_str + explicit_time
+            print(final_str.ljust(last_width), end=end)
         except UnicodeEncodeError:
             ascii_str = _build_bar(fill, width, _START_CHAR_ALT, _FULL_CHAR_ALT,
                             _THREE_CHAR_ALT, _TWO_CHAR_ALT, _ONE_CHAR_ALT,
                             _EMPTY_CHAR_ALT, _END_CHAR_ALT)
-            print(ascii_str + explicit_time, end=end)
+            final_str = ascii_str + explicit_time
+            print(final_str.ljust(last_width), end=end)
+        last_width = len(final_str)
         sleep(1/update_freq)
 
 

@@ -18,7 +18,7 @@ import re
 import time
 from internal.docopt import docopt
 from internal.config import get_configuration
-from internal.timekeep import count_seconds, human_time_interval
+from internal.timekeep import countdown_seconds, human_time_interval
 from internal.editor import get_input_from_editor
 
 
@@ -120,7 +120,7 @@ def _run():
     try:
         while True:
             print(f'Pomodoro #{pomodoro_count+1} starting!')
-            count_seconds(pomodoro)
+            countdown_seconds(pomodoro)
 
             try:
                 checkmarks = '✓'*((pomodoro_count%4) + 1)
@@ -133,13 +133,13 @@ def _run():
                     print('⏲️ Take a long break!')
                 except UnicodeEncodeError:
                     print('Take a long break!')
-                count_seconds(long_)
+                countdown_seconds(long_)
             else:
                 try:
                     print('⏲️ Take a short break!')
                 except UnicodeEncodeError:
                     print('Take a short break!')
-                count_seconds(short)
+                countdown_seconds(short)
     except KeyboardInterrupt:
         pass
 
@@ -156,7 +156,7 @@ def _run():
 
 
 if __name__ == '__main__':
-    arguments = docopt(__doc__, version="pomo 0.1")
+    arguments = docopt(__doc__, version="pomo 0.2")
 
     if arguments['list']:
         _list_properties()
