@@ -8,10 +8,12 @@ Usage:
     pomo list
     pomo set <property> <value>
     pomo --help             
+    pomo --man
     pomo --version
 
 Options:
     -h --help               Show this screen
+    --man                   Show the README.
     --version               Display this program's version.
 """
 
@@ -27,6 +29,17 @@ from internal.notify import notify_and_print
 
 TIME_INTERVAL_RE = re.compile(
     r'^\s*(\d+(?:\.\d+)?)\s?(h(?:ours?)?|m(?:inutes?)?|s(?:econds?)?)?\s*$', re.IGNORECASE)
+
+
+def _print_readme():
+    README_PATH = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)),
+            'README.md')
+    if not os.path.exists(README_PATH):
+        print('README not found.')
+        exit(1)
+    with open(README_PATH, 'r') as readme_file:
+        print(readme_file.read())
 
 
 def _list_properties():
@@ -189,7 +202,11 @@ def _run(with_tasks):
 
 
 if __name__ == '__main__':
-    arguments = docopt(__doc__, version="pomo 0.5")
+    arguments = docopt(__doc__, version="pomo 0.6")
+
+    if arguments['--man']:
+        _print_readme()
+        exit(0)
 
     if arguments['list']:
         _list_properties()
