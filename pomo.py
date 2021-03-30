@@ -16,6 +16,7 @@ Options:
 
 import re
 import time
+import os
 from internal.docopt import docopt
 from internal.config import get_configuration
 from internal.timekeep import countdown_seconds, human_time_interval
@@ -94,6 +95,30 @@ def _run():
         short = int(config['config']['short']['value'])
         long_ = int(config['config']['long']['value'])
 
+    # Check that editor is valid at runtime
+    if not (os.path.exists(editor_exe) and os.access(editor_exe, os.X_OK)):
+        editor_exe = os.environ['EDITOR']
+        if not editor_exe or \
+         not (os.path.exists(editor_exe) and os.access(editor_exe, os.X_OK)):
+            editor_exe = '/bin/nano'
+            if not (os.path.exists(editor_exe) \
+                    and os.access(editor_exe, os.X_OK)):
+                print('Configured editor does not exist, $EDITOR is not set, '
+                        'and could not fall back to /bin/nano.\n'
+                        'Please set your text editor using '
+                        '`pomo set editor <editor path>')
+                exit(1)
+            else:
+                print('Warning: configured editor does not exist and $EDITOR '
+                        'is not set. Falling back to /bin/nano.')
+                with get_configuration() as config:
+                    config['config']['editor']['value'] = '/bin/nano'
+        else:
+           print('Warning: configured editor does not exist. '
+                   f'Falling back to $EDITOR ("{os.environ["EDITOR"]}").')
+           with get_configuration() as config:
+               config['config']['editor']['value'] = os.environ['EDITOR']
+
     # Get tasks
     empty_text = ('# Write your tasks separated by a blank line.\n'
         '# Lines starting with a # will be ignored.\n'
@@ -157,7 +182,7 @@ def _run():
 
 
 if __name__ == '__main__':
-    arguments = docopt(__doc__, version="pomo 0.2")
+    arguments = docopt(__doc__, version="pomo 0.3")
 
     if arguments['list']:
         _list_properties()
