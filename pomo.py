@@ -32,13 +32,13 @@ TIME_INTERVAL_RE = re.compile(
 
 
 def _print_readme():
-    README_PATH = os.path.join(
+    readme_path = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             'README.md')
-    if not os.path.exists(README_PATH):
+    if not os.path.exists(readme_path):
         print('README not found.')
         exit(1)
-    with open(README_PATH, 'r') as readme_file:
+    with open(readme_path, 'r') as readme_file:
         print(readme_file.read())
 
 
@@ -58,8 +58,8 @@ def _edit_mode(arguments):
         prop = arguments['<property>']
         if prop not in config['config']:
             print(f'{prop} is not a recognized property. '
-                    'Call `pomo list` for a list of configuration properties '
-                    'that can be set.')
+                  'Call `pomo list` for a list of configuration properties '
+                  'that can be set.')
             exit(1)
         
         # Check if value can be coerced into correct type
@@ -69,8 +69,8 @@ def _edit_mode(arguments):
             matches = TIME_INTERVAL_RE.match(new_value) 
             if matches is None:
                 print(f'"{prop}" is expected to be time, but "{new_value}" '
-                       'could not be read as time. Expected number followed '
-                       'by "seconds", "minutes", "hours", "s", "m" or "h".')
+                      'could not be read as time. Expected number followed '
+                      'by "seconds", "minutes", "hours", "s", "m" or "h".')
                 exit(1)
             new_value = float(matches.group(1))
             unit = matches.group(2)
@@ -83,11 +83,11 @@ def _edit_mode(arguments):
             new_value = os.path.realpath(new_value)
             if not os.path.exists(new_value):
                 print(f'"{prop}" is expected to point to an executable, '
-                        f'but "{new_value}" does not exist.')
+                      f'but "{new_value}" does not exist.')
                 exit(1)
             if not os.access(new_value, os.X_OK):
                 print(f'"{prop}" is expected to point to an executable, '
-                        f'but "{new_value}" is not an executable.')
+                      f'but "{new_value}" is not an executable.')
                 exit(1)
         else:
             raise Exception(f'Type "{type_}" not implemented!')
@@ -115,30 +115,30 @@ def _run(with_tasks):
         if not (os.path.exists(editor_exe) and os.access(editor_exe, os.X_OK)):
             editor_exe = os.environ['EDITOR']
             if not editor_exe or \
-             not (os.path.exists(editor_exe) and os.access(editor_exe, os.X_OK)):
+                    not (os.path.exists(editor_exe) and os.access(editor_exe, os.X_OK)):
                 editor_exe = '/bin/nano'
-                if not (os.path.exists(editor_exe) \
+                if not (os.path.exists(editor_exe)
                         and os.access(editor_exe, os.X_OK)):
                     print('Configured editor does not exist, $EDITOR is '
-                            'not set and could not fall back to /bin/nano.\n'
-                            'Please set your text editor using '
-                            '`pomo set editor <editor path>')
+                          'not set and could not fall back to /bin/nano.\n'
+                          'Please set your text editor using '
+                          '`pomo set editor <editor path>')
                     exit(1)
                 else:
                     print('Warning: configured editor does not exist and '
-                        '$EDITOR is not set. Falling back to /bin/nano.')
+                          '$EDITOR is not set. Falling back to /bin/nano.')
                     with get_configuration() as config:
                         config['config']['editor']['value'] = '/bin/nano'
             else:
-               print('Warning: configured editor does not exist. '
-                       f'Falling back to $EDITOR ("{os.environ["EDITOR"]}").')
-               with get_configuration() as config:
-                   config['config']['editor']['value'] = os.environ['EDITOR']
+                print('Warning: configured editor does not exist. '
+                      f'Falling back to $EDITOR ("{os.environ["EDITOR"]}").')
+                with get_configuration() as config:
+                    config['config']['editor']['value'] = os.environ['EDITOR']
 
         # Get tasks
         empty_text = ('# Write your tasks separated by a blank line.\n'
-            '# Lines starting with a # will be ignored.\n'
-            '# Once you\'re done, exit the editor.')
+                      '# Lines starting with a # will be ignored.\n'
+                      '# Once you\'re done, exit the editor.')
         tasks_input = get_input_from_editor(empty_text, editor_exe)
         tasks = map(lambda task: task.strip(), tasks_input.split('\n\n'))
         tasks = filter(lambda task: task, tasks)
@@ -167,12 +167,12 @@ def _run(with_tasks):
             countdown_seconds(pomodoro)
 
             try:
-                checkmarks = '✓'*((pomodoro_count%4) + 1)
+                checkmarks = '✓'*((pomodoro_count % 4) + 1)
                 notify_and_print(f'{checkmarks} Done!')
             except UnicodeEncodeError:
                 notify_and_print('Done!')
 
-            if ((pomodoro_count+1)%4) == 0:
+            if ((pomodoro_count+1) % 4) == 0:
                 try:
                     notify_and_print('⏲️ Take a long break!')
                 except UnicodeEncodeError:
@@ -202,19 +202,18 @@ def _run(with_tasks):
 
 
 if __name__ == '__main__':
-    arguments = docopt(__doc__, version="pomo 0.6")
+    args = docopt(__doc__, version="pomo 0.6")
 
-    if arguments['--man']:
+    if args['--man']:
         _print_readme()
         exit(0)
 
-    if arguments['list']:
+    if args['list']:
         _list_properties()
         exit(0)
 
-    if arguments['set']:
-        _edit_mode(arguments)
+    if args['set']:
+        _edit_mode(args)
         exit(0)
     
-    _run(not arguments['timer'])
-
+    _run(not args['timer'])
