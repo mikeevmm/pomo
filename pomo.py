@@ -21,6 +21,7 @@ from internal.docopt import docopt
 from internal.config import get_configuration
 from internal.timekeep import countdown_seconds, human_time_interval
 from internal.editor import get_input_from_editor
+from internal.notify import notify_and_print
 
 
 TIME_INTERVAL_RE = re.compile(
@@ -144,26 +145,26 @@ def _run():
     pomodoro_count = 0
     try:
         while True:
-            print(f'Pomodoro #{pomodoro_count+1} starting!')
+            notify_and_print(f'Pomodoro #{pomodoro_count+1} starting!')
             countdown_seconds(pomodoro)
 
             try:
                 checkmarks = '✓'*((pomodoro_count%4) + 1)
-                print(f'{checkmarks} Done!')
+                notify_and_print(f'{checkmarks} Done!')
             except UnicodeEncodeError:
-                print('Done!')
+                notify_and_print('Done!')
 
             if ((pomodoro_count+1)%4) == 0:
                 try:
-                    print('⏲️ Take a long break!')
+                    notify_and_print('⏲️ Take a long break!')
                 except UnicodeEncodeError:
-                    print('Take a long break!')
+                    notify_and_print('Take a long break!')
                 countdown_seconds(long_)
             else:
                 try:
-                    print('⏲️ Take a short break!')
+                    notify_and_print('⏲️ Take a short break!')
                 except UnicodeEncodeError:
-                    print('Take a short break!')
+                    notify_and_print('Take a short break!')
                 countdown_seconds(short)
             pomodoro_count += 1
     except KeyboardInterrupt:
@@ -182,7 +183,7 @@ def _run():
 
 
 if __name__ == '__main__':
-    arguments = docopt(__doc__, version="pomo 0.3")
+    arguments = docopt(__doc__, version="pomo 0.4")
 
     if arguments['list']:
         _list_properties()
