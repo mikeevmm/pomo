@@ -4,6 +4,7 @@
 
 Usage:
     pomo
+    pomo timer
     pomo list
     pomo set <property> <value>
     pomo --help             
@@ -89,56 +90,60 @@ def _edit_mode(arguments):
             print(f'"{prop}": "{prev_value}" -> "{new_value}"')
 
 
-def _run():
+def _run(with_tasks):
     with get_configuration() as config:
         editor_exe = config['config']['editor']['value']
         pomodoro = int(config['config']['pomodoro']['value'])
         short = int(config['config']['short']['value'])
         long_ = int(config['config']['long']['value'])
 
-    # Check that editor is valid at runtime
-    if not (os.path.exists(editor_exe) and os.access(editor_exe, os.X_OK)):
-        editor_exe = os.environ['EDITOR']
-        if not editor_exe or \
-         not (os.path.exists(editor_exe) and os.access(editor_exe, os.X_OK)):
-            editor_exe = '/bin/nano'
-            if not (os.path.exists(editor_exe) \
-                    and os.access(editor_exe, os.X_OK)):
-                print('Configured editor does not exist, $EDITOR is not set, '
-                        'and could not fall back to /bin/nano.\n'
-                        'Please set your text editor using '
-                        '`pomo set editor <editor path>')
-                exit(1)
+    if with_tasks:
+        # Check that editor is valid at runtime
+        if not (os.path.exists(editor_exe) and os.access(editor_exe, os.X_OK)):
+            editor_exe = os.environ['EDITOR']
+            if not editor_exe or \
+             not (os.path.exists(editor_exe) and os.access(editor_exe, os.X_OK)):
+                editor_exe = '/bin/nano'
+                if not (os.path.exists(editor_exe) \
+                        and os.access(editor_exe, os.X_OK)):
+                    print('Configured editor does not exist, $EDITOR is '
+                            'not set and could not fall back to /bin/nano.\n'
+                            'Please set your text editor using '
+                            '`pomo set editor <editor path>')
+                    exit(1)
+                else:
+                    print('Warning: configured editor does not exist and '
+                        '$EDITOR is not set. Falling back to /bin/nano.')
+                    with get_configuration() as config:
+                        config['config']['editor']['value'] = '/bin/nano'
             else:
-                print('Warning: configured editor does not exist and $EDITOR '
-                        'is not set. Falling back to /bin/nano.')
-                with get_configuration() as config:
-                    config['config']['editor']['value'] = '/bin/nano'
-        else:
-           print('Warning: configured editor does not exist. '
-                   f'Falling back to $EDITOR ("{os.environ["EDITOR"]}").')
-           with get_configuration() as config:
-               config['config']['editor']['value'] = os.environ['EDITOR']
+               print('Warning: configured editor does not exist. '
+                       f'Falling back to $EDITOR ("{os.environ["EDITOR"]}").')
+               with get_configuration() as config:
+                   config['config']['editor']['value'] = os.environ['EDITOR']
 
-    # Get tasks
-    empty_text = ('# Write your tasks separated by a blank line.\n'
-        '# Lines starting with a # will be ignored.\n'
-        '# Once you\'re done, exit the editor.')
-    tasks_input = get_input_from_editor(empty_text, editor_exe)
-    tasks = map(lambda task: task.strip(), tasks_input.split('\n\n'))
-    tasks = filter(lambda task: task, tasks)
-    tasks = map(lambda task: ' '.join(x.strip() for x in task.split('\n') if not x.startswith('#')), tasks)
-    tasks = filter(lambda task: task, tasks)
-    tasks = list(tasks)
-    
-    # Abort
-    if len(tasks) == 0:
-        exit(0)
+        # Get tasks
+        empty_text = ('# Write your tasks separated by a blank line.\n'
+            '# Lines starting with a # will be ignored.\n'
+            '# Once you\'re done, exit the editor.')
+        tasks_input = get_input_from_editor(empty_text, editor_exe)
+        tasks = map(lambda task: task.strip(), tasks_input.split('\n\n'))
+        tasks = filter(lambda task: task, tasks)
+        tasks = map(lambda task: ' '.join(
+            x.strip() for x in task.split('\n') if not x.startswith('#')),
+            tasks)
+        tasks = filter(lambda task: task, tasks)
+        tasks = list(tasks)
+        
+        # Abort
+        if len(tasks) == 0:
+            print('No tasks given, exiting')
+            exit(0)
 
-    # User feedback
-    print('Ok, your tasks are:')
-    print('\n'.join(f'  [{i}]: {task}' for i, task in enumerate(tasks)))
-    print('')
+        # User feedback
+        print('Ok, your tasks are:')
+        print('\n'.join(f'  [{i}]: {task}' for i, task in enumerate(tasks)))
+        print('')
 
     # Start pomodoro routine
     start_time = time.time()
@@ -174,8 +179,9 @@ def _run():
     work_time = time.time() - start_time
     print('\n')
     print('Good work!')
-    print('Your tasks were:')
-    print('\n'.join(f'  - {task}' for i, task in enumerate(tasks)))
+    if with_tasks:
+        print('Your tasks were:')
+        print('\n'.join(f'  - {task}' for i, task in enumerate(tasks)))
     print(f'You worked for {human_time_interval(work_time)}.')
     print(f'You worked through {pomodoro_count} pomodoros.')
     print('See you next time!')
@@ -183,7 +189,7 @@ def _run():
 
 
 if __name__ == '__main__':
-    arguments = docopt(__doc__, version="pomo 0.4")
+    arguments = docopt(__doc__, version="pomo 0.5")
 
     if arguments['list']:
         _list_properties()
@@ -193,5 +199,5 @@ if __name__ == '__main__':
         _edit_mode(arguments)
         exit(0)
     
-    _run()
+    _run(not arguments['timer'])
 
