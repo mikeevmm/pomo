@@ -7,6 +7,7 @@ Usage:
     pomo timer
     pomo list
     pomo set <property> <value>
+    pomo reset <property>
     pomo --help             
     pomo --man
     pomo --version
@@ -113,6 +114,26 @@ def _edit_mode(arguments):
             print(f'"{prop}": "{prev_value}" → "{new_value}"')
         except UnicodeEncodeError:
             print(f'"{prop}": "{prev_value}" -> "{new_value}"')
+
+
+def _reset_mode(args):
+    to_reset = args['<property>']
+    default_config = get_default_configuration()
+    with get_configuration() as config:
+        if to_reset not in config['config']:
+            print(f'Property \'{to_reset}\' does not exist.\n'
+                    'Call `pomo list` to see a list of the existing '
+                    'properties and their descriptions.')
+            exit(1)
+        old_value = config['config'][to_reset]['value']
+        new_value = default_config['config'][to_reset]['value']
+        config['config'][to_reset]['value'] = new_value
+
+    # User feedback
+    try:
+        print(f'"{to_reset}": "{old_value}" → "{new_value}"')
+    except UnicodeEncodeError:
+        print(f'"{to_reset}": "{old_value}" -> "{new_value}"')
 
 
 def _run(with_tasks):
@@ -225,7 +246,7 @@ def _run(with_tasks):
 
 
 if __name__ == '__main__':
-    args = docopt(__doc__, version="pomo 0.7")
+    args = docopt(__doc__, version="pomo 0.8")
 
     if args['--man']:
         _print_readme()
@@ -237,6 +258,10 @@ if __name__ == '__main__':
 
     if args['set']:
         _edit_mode(args)
+        exit(0)
+
+    if args['reset']:
+        _reset_mode(args)
         exit(0)
     
     _run(not args['timer'])
