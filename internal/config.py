@@ -28,6 +28,11 @@ _DEFAULT_JSON = {
                 "name": "The editor to use for writing tasks.",
                 "value": "/usr/bin/vim",
                 "type": "exe"
+            },
+            "sound": {
+                "name": "The sound to play when a pomodoro ends.",
+                "value": os.path.join(_PATH, 'internal', 'pomodoro.wav'),
+                "type": "file?"
             }
         }
     }

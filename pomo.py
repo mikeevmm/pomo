@@ -20,8 +20,10 @@ Options:
 import re
 import time
 import os
+import threading
 from internal.docopt import docopt
-from internal.config import get_configuration
+from internal.playsound import playsound
+from internal.config import get_configuration, get_default_configuration
 from internal.timekeep import countdown_seconds, human_time_interval
 from internal.editor import get_input_from_editor
 from internal.notify import notify_and_print
@@ -120,6 +122,14 @@ def _run(with_tasks):
         short = int(config['config']['short']['value'])
         long_ = int(config['config']['long']['value'])
 
+        # Backwards compatibility: if property sound does not
+        # exist, set it to the default value
+        if 'sound' not in config['config']:
+            config['config']['sound'] = \
+                    get_default_configuration()['config']['sound']
+        sound = config['config']['sound']['value']
+        play_sound = os.path.exists(sound)
+
     if with_tasks:
         # Check that editor is valid at runtime
         if not (os.path.exists(editor_exe) and os.access(editor_exe, os.X_OK)):
@@ -182,6 +192,9 @@ def _run(with_tasks):
             except UnicodeEncodeError:
                 notify_and_print('Done!')
 
+            if play_sound:
+                threading.Thread(target=playsound, args=(sound,)).start()
+
             if ((pomodoro_count+1) % 4) == 0:
                 try:
                     notify_and_print('⏲️ Take a long break!')
@@ -212,7 +225,7 @@ def _run(with_tasks):
 
 
 if __name__ == '__main__':
-    args = docopt(__doc__, version="pomo 0.6")
+    args = docopt(__doc__, version="pomo 0.7")
 
     if args['--man']:
         _print_readme()
