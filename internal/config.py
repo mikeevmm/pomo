@@ -39,6 +39,9 @@ def get_configuration():
     json_name = os.path.join(_PATH, _JSON)
     return _Config(json_name)
 
+def get_default_configuration():
+    return _DEFAULT_JSON
+
 
 class _Config:
     def __init__(self, json_name):
