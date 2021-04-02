@@ -72,12 +72,18 @@ def _edit_mode(arguments):
         new_value = arguments['<value>']
         optional = type_.endswith('?')
         if (not optional) or new_value:
+            def warn_if_optional():
+                if optional:
+                    print('This property is optional, and can be disabled by '
+                            'setting it to an empty value (\'\').')
+
             if type_.startswith('time'):
                 matches = TIME_INTERVAL_RE.match(new_value) 
                 if matches is None:
                     print(f'"{prop}" is expected to be time, but "{new_value}" '
                           'could not be read as time. Expected number followed '
                           'by "seconds", "minutes", "hours", "s", "m" or "h".')
+                    warn_if_optional()
                     exit(1)
                 new_value = float(matches.group(1))
                 unit = matches.group(2)
@@ -91,16 +97,19 @@ def _edit_mode(arguments):
                 if not os.path.exists(new_value):
                     print(f'"{prop}" is expected to point to an executable, '
                           f'but "{new_value}" does not exist.')
+                    warn_if_optional()
                     exit(1)
                 if not os.access(new_value, os.X_OK):
                     print(f'"{prop}" is expected to point to an executable, '
                           f'but "{new_value}" is not an executable.')
+                    warn_if_optional()
                     exit(1)
             elif type_.startswith('file'):
                 new_value = os.path.realpath(new_value)
                 if not os.path.exists(new_value):
                     print(f'"{prop}" is expected to point to a file, '
                           f'but "{new_value}" does not exist.')
+                    warn_if_optional()
                     exit(1)
             else:
                 raise Exception(f'Type "{type_}" not implemented!')
