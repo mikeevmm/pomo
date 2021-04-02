@@ -44,6 +44,12 @@ pomo set pomodoro 1h # Sets the pomodoro times to be 1 hour
 
 For times, you can use a number followed by s/m/h or seconds/minutes/hours. If you use the latter, make sure to enclose the value in quotes (e.g., `"10 minutes"`). If you don't specify a unit, seconds will be assumed.
 
+You can reset a variable to its default value by calling
+
+```bash
+pomo reset <property>
+```
+
 ## Timer mode
 
 `pomo` has a timer mode where it does not prompt you for tasks.
