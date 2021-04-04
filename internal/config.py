@@ -31,7 +31,7 @@ _DEFAULT_JSON = {
             },
             "sound": {
                 "name": "The sound to play when a pomodoro ends.",
-                "value": os.path.join(_PATH, 'internal', 'pomodoro.wav'),
+                "value": os.path.join(_PATH, 'pomodoro.wav'),
                 "type": "file?"
             }
         }

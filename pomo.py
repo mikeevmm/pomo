@@ -255,7 +255,7 @@ def _run(with_tasks):
 
 
 if __name__ == '__main__':
-    args = docopt(__doc__, version="pomo 0.8")
+    args = docopt(__doc__, version="pomo 0.9")
 
     if args['--man']:
         _print_readme()
