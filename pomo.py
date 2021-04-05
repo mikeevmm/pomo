@@ -159,7 +159,13 @@ def _run(with_tasks):
             config['config']['sound'] = \
                     get_default_configuration()['config']['sound']
         sound = config['config']['sound']['value']
-        play_sound = os.path.exists(sound)
+        play_sound = (sound and os.path.exists(sound))
+
+        if 'break-sound' not in config['config']:
+            config['config']['break-sound'] = \
+                    get_default_configuration()['config']['break-sound']
+        break_sound = config['config']['break-sound']['value']
+        play_break_sound = (break_sound and os.path.exists(break_sound))
 
     if with_tasks:
         # Check that editor is valid at runtime
@@ -238,6 +244,10 @@ def _run(with_tasks):
                 except UnicodeEncodeError:
                     notify_and_print('Take a short break!')
                 countdown_seconds(short)
+
+            if play_break_sound:
+                threading.Thread(target=playsound, args=(break_sound,)).start()
+
             pomodoro_count += 1
     except KeyboardInterrupt:
         pass
