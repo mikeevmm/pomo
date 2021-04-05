@@ -87,10 +87,11 @@ def _edit_mode(arguments):
                     exit(1)
                 new_value = float(matches.group(1))
                 unit = matches.group(2)
-                if unit.startswith('m'):
-                    new_value *= 60 
-                elif unit.startswith('h'):
-                    new_value *= 3600
+                if unit is not None:
+                    if unit.startswith('m'):
+                        new_value *= 60 
+                    elif unit.startswith('h'):
+                        new_value *= 3600
                 new_value = int(new_value)
             elif type_.startswith('exe'):
                 new_value = os.path.realpath(new_value)
