@@ -7,6 +7,10 @@ A command-line based pomodoro timer.
 Run `pomo`, list your tasks and start working.
 `pomo` will count your pomodoros and breaks for you.
 
+## Requirements
+
+`pomo` uses `libnotify` (in particular `notify-send`) to send notifications. If you are using Linux, you likely already have this.
+
 ## Quick Start
 
 ```bash
